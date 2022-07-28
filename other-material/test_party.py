@@ -11,91 +11,62 @@ from pyspark.sql.types import *
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName('SparkByExamples.com').getOrCreate()
 
-bankData = [(1001,"BOGOTA","BANCO"),
-(1002,"POPULAR","BANCO"),
-(1006,"ITAU","BANCO"),
-(1007,"BANCOLOMBIA","BANCO"),
-(1009,"CITIBANK","BANCO"),
-(1012,"SUDAMERIS","BANCO"),
-(1013,"BBVA","BANCO"),
-(1014,"ITAU*","BANCO"),
-(1019,"SCOTIABANK COLPATRIA","BANCO"),
-(1023,"OCCIDENTE","BANCO"),
-(1031,"BANCOLDEX","BANCO"),
-(1032,"CAJA SOCIAL BCSC","BANCO"),
-(1040,"BANCO AGRARIO","BANCO"),
-(1051,"DAVIVIENDA","BANCO"),
-(1052,"AVVILLAS","BANCO"),
-(1053,"BANCO","BANCO"),
-(1059,"BANCAMIA","BANCO"),
-(1060,"BANCO PICHINCHA","BANCO"),
-(1061,"BANCOOMEVA","BANCO"),
-(1062,"BANCO FALABELLA","BANCO"),
-(1065,"SANTANDER","BANCO"),
-(1066,"COOPCENTRAL","BANCO"),
-(1069,"BANCO SERFINANZA S.A.","BANCO"),
-(1101,"PSE","BANCO"),
-(1151,"RAPPIPAY","BANCO"),
-(1283,"CFA COOPERATIVA FINANCIERA","BANCO"),
-(1289,"COTRAFA","BANCO"),
-(1292,"CONFIAR COOPERATIVA FIN","BANCO"),
-(1303,"GIROS Y FINANZAS","BANCO"),
-(1370,"COLTEFINANCIERA","BANCO"),
-(1507,"NEQUI","BANCO"),
-(1551,"DAVIPLATA","BANCO"),
-(1558,"CREDIFINANCIERA","BANCO"),
-(2380,"OPERADOR 1","OPERADOR DE INFORMACION"),
-(4685,"OPERADOR 2","OPERADOR DE INFORMACION"),
-(2046,"OPERADOR 3","OPERADOR DE INFORMACION"),
-(3463,"OPERADOR 4","OPERADOR DE INFORMACION"),
-(2218,"OPERADOR 5","OPERADOR DE INFORMACION"),
-(4806,"OPERADOR 6","OPERADOR DE INFORMACION"),
-(3587,"OPERADOR 7","OPERADOR DE INFORMACION"),
-(4476,"OPERADOR 8","OPERADOR DE INFORMACION"),
-(3081,"OPERADOR 9","OPERADOR DE INFORMACION"),
-(4543,"OPERADOR 10","OPERADOR DE INFORMACION"),
-(4571,"OPERADOR 11","OPERADOR DE INFORMACION"),
-(3554,"OPERADOR 12","OPERADOR DE INFORMACION"),
-(3836,"OPERADOR 13","OPERADOR DE INFORMACION"),
-(2753,"OPERADOR 14","OPERADOR DE INFORMACION"),
-(4814,"OPERADOR 15","OPERADOR DE INFORMACION"),
-(4021,"OPERADOR 16","OPERADOR DE INFORMACION"),
-(4983,"OPERADOR 17","OPERADOR DE INFORMACION"),
-(4342,"OPERADOR 18","OPERADOR DE INFORMACION"),
-(4547,"OPERADOR 19","OPERADOR DE INFORMACION"),
-(2553,"OPERADOR 20","OPERADOR DE INFORMACION"),
-(3747,"OPERADOR 21","OPERADOR DE INFORMACION"),
-(4538,"OPERADOR 22","OPERADOR DE INFORMACION"),
-(4968,"OPERADOR 23","OPERADOR DE INFORMACION"),
-(2837,"OPERADOR 24","OPERADOR DE INFORMACION"),
-(3961,"OPERADOR 25","OPERADOR DE INFORMACION"),
-(2049,"OPERADOR 26","OPERADOR DE INFORMACION"),
-(2400,"OPERADOR 27","OPERADOR DE INFORMACION"),
-(4218,"OPERADOR 28","OPERADOR DE INFORMACION"),
-(4635,"OPERADOR 29","OPERADOR DE INFORMACION"),
-(4369,"OPERADOR 30","OPERADOR DE INFORMACION"),
-(3919,"OPERADOR 31","OPERADOR DE INFORMACION"),
-(2255,"OPERADOR 32","OPERADOR DE INFORMACION"),
-(3857,"OPERADOR 33","OPERADOR DE INFORMACION"),
-(4320,"OPERADOR 34","OPERADOR DE INFORMACION"),
-(2581,"OPERADOR 35","OPERADOR DE INFORMACION"),
-(2800,"OPERADOR 36","OPERADOR DE INFORMACION"),
-(4193,"OPERADOR 37","OPERADOR DE INFORMACION"),
-(4167,"OPERADOR 38","OPERADOR DE INFORMACION")]
+bankData = [
+    (1001,"BOGOTA","BANCO",8622441612,870982,"CUENTA PUENTE ACH","REJECTED"),
+    (1002,"POPULAR","BANCO",9644268579,103264,"CUENTA PUENTE ACH",""),
+    (1006,"ITAU","BANCO",6618214252,643577,"",""),
+    (1014,"ITAU*","BANCO",6618214252,449328,"","REJECTED"),
+    (1032,"CAJA SOCIAL BCSC","BANCO",1111009053,0,"",""),
+    (1052,"AVVILLAS","BANCO",2548338895,0,"","REJECTED"),
+    (1053,"BOGOTA","BANCO",8622441612,850640,"CUENTA PUENTE ACH",""),
+    (1065,"POPULAR","BANCO",9644268579,0,"",""),
+    (1014,"ITAU*","BANCO",6618214252,449328,"",""),
+    (2380,"OPERADOR 1","OPERADOR DE INFORMACION",1685991319,397595,"",""),
+    (4685,"OPERADOR 2","OPERADOR DE INFORMACION",9077631582,437664,"",""),
+    (2046,"OPERADOR 3","OPERADOR DE INFORMACION",8239190256,320653,"",""),
+        ]
 
-schema = ["partyexternalidentifier","partyname","partytype"]
+#schema = ["partyexternalidentifier","partyname","partytype"]
+schema = ["partyexternalidentifier","partyname","partytype","numrastreo","valortransac","cuentapuente","status"]
 
 bancos_df = spark.createDataFrame(data=bankData, schema = schema)
 bancos_df.printSchema()
 bancos_df.show(truncate=False)
 
 # Table bancos
-bancos_df = bancos_df.withColumnRenamed('partyname','nombre') \
-                     .withColumnRenamed('partyexternalidentifier','codigobanco').show(truncate=False)
+# resumenTransac_df = resumenTransac_df \
+#                 .withColumn('numrastreo', resumenTransac_df["numrastreo"][0:8]) \
+#                 .withColumnRenamed('numrastreo', "codigobancoorigen") \
+#                 .withColumn('valorcero', when(resumenTransac_df["valortransac"] == 0, 1).otherwise(0)) \
+#                 .withColumn('cuentapuente', udfCuentaPuente("nomdestinatario")) \
+#                 .groupBy('idlote','fecha', 'periodo', 'year', 'month', 'day','codigotransaccion' \
+#                         ,'codigobancoorigen','codigobancodestino','valorcero', 'cuentapuente') \
+#                 .agg(F.count('idlote').alias('cantidad'), F.sum('valortransac').alias('valor'))
+
+bancos_df.drop('partyexternalidentifier')
+
+bancos_df = bancos_df.withColumn('partyname',when(bancos_df["partyname"] == 'ITAU*', 'ITAU').otherwise(bancos_df["partyname"])) \
+                     .withColumnRenamed('partyname','nombre') \
+                     .withColumn('numrastreo', bancos_df["numrastreo"][0:8]) \
+                     .withColumnRenamed('numrastreo', "codigobancoorigen") \
+                     .withColumn('valorcero', when(bancos_df["valortransac"] == 0, 1).otherwise(0)) \
+                     .groupBy('nombre', 'partytype', 'codigobancoorigen', \
+                        'valorcero', 'cuentapuente','status') \
+                     .agg(F.count('nombre').alias('cantidad'), F.sum('valortransac').alias('valor'))
+
+bancos_df.show()
+
+bancos_df = bancos_df.filter("partytype = 'BANCO'") \
+                     .filter("status <> 'REJECTED'")
+
+bancos_df.show()
 
 
-bancos_df = bancos_df.withColumn('nombre', \
-                      when(bancos_df["nombre"] == 'ITAU*', 'ITAU') \
-                    .otherwise(bancos_df["nombre"])) \
-                    .na.fill('NO EXISTE EN EL CATALOGO', ["nombre"]) \
-                    .filter("partytype = 'BANCO'").show(truncate=False)
+# bancos_df = bancos_df.withColumnRenamed('partyname','nombre') \
+#                      .withColumnRenamed('partyexternalidentifier','codigobanco').show(truncate=False)
+
+# bancos_df = bancos_df.withColumn('nombre', \
+#                       when(bancos_df["nombre"] == 'ITAU*', 'ITAU') \
+#                     .otherwise(bancos_df["nombre"])) \
+#                     .na.fill('NO EXISTE EN EL CATALOGO', ["nombre"]) \
+#                     .filter("partytype = 'BANCO'").show(truncate=False)
