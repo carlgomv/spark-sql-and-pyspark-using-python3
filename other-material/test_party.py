@@ -26,34 +26,35 @@ class test_party():
 
         schema = ["partyexternalidentifier","partyname","partytype","numrastreo","valortransac","nomdestinatario","status"]
 
-        bancos_df = spark.createDataFrame(data=bankData, schema = schema)
-        bancos_df.printSchema()
-        bancos_df.show(truncate=False)
-#        udfCuentaPuente = F.udf(cuentapuente_data, IntegerType())
-#                        .withColumn('cuentapuente', udfCuentaPuente("nomdestinatario")) \
+        def transform(self):
+                bancos_df = spark.createDataFrame(data=bankData, schema = schema)
+                bancos_df.printSchema()
+                bancos_df.show(truncate=False)
+                udfCuentaPuente = F.udf(self.cuentapuente_data, IntegerType())
 
-        bancos_df.drop('partyexternalidentifier')
+                bancos_df.drop('partyexternalidentifier')
 
-        bancos_df = bancos_df.withColumn('partyname',when(bancos_df["partyname"] == 'ITAU*', 'ITAU').otherwise(bancos_df["partyname"])) \
-                        .withColumnRenamed('partyname','nombre') \
-                        .withColumn('numrastreo', bancos_df["numrastreo"][0:8]) \
-                        .withColumnRenamed('numrastreo', "codigobancoorigen") \
-                        .withColumn('valorcero', when(bancos_df["valortransac"] == 0, 1).otherwise(0)) \
-                        .groupBy('nombre', 'partytype', 'codigobancoorigen', \
-                                'valorcero', 'nomdestinatario','status') \
-                        .agg(F.count('nombre').alias('cantidad'), F.sum('valortransac').alias('valor'))
+                bancos_df = bancos_df.withColumn('partyname',when(bancos_df["partyname"] == 'ITAU*', 'ITAU').otherwise(bancos_df["partyname"])) \
+                                .withColumnRenamed('partyname','nombre') \
+                                .withColumn('numrastreo', bancos_df["numrastreo"][0:8]) \
+                                .withColumn('cuentapuente', udfCuentaPuente("nomdestinatario")) \
+                                .withColumnRenamed('numrastreo', "codigobancoorigen") \
+                                .withColumn('valorcero', when(bancos_df["valortransac"] == 0, 1).otherwise(0)) \
+                                .groupBy('nombre', 'partytype', 'codigobancoorigen', \
+                                        'valorcero', 'nomdestinatario','status') \
+                                .agg(F.count('nombre').alias('cantidad'), F.sum('valortransac').alias('valor'))
 
-        bancos_df.show()
+                bancos_df.show()
 
-        bancos_df = bancos_df.filter("partytype = 'BANCO'") \
-                        .filter("status <> 'REJECTED'")
+                bancos_df = bancos_df.filter("partytype = 'BANCO'") \
+                                .filter("status <> 'REJECTED'")
 
-        bancos_df.show()
+                bancos_df.show()
 
-        # @staticmethod
-        # def cuentapuente_data(value):
-        #         str_message = str(value)
-        #         if str_message.startswith('CUENTA PUENTE ACH'):
-        #                 return 1
-        #         else:
-        #                 return 0
+        @staticmethod
+        def cuentapuente_data(value):
+                str_message = str(value)
+                if str_message.startswith('CUENTA PUENTE ACH'):
+                        return 1
+                else:
+                        return 0
