@@ -29,8 +29,6 @@ class test_party():
         bancos_df = spark.createDataFrame(data=bankData, schema = schema)
         bancos_df.printSchema()
         bancos_df.show(truncate=False)
-#        udfCuentaPuente = F.udf(cuentapuente_data, IntegerType())
-#                        .withColumn('cuentapuente', udfCuentaPuente("nomdestinatario")) \
 
         bancos_df.drop('partyexternalidentifier')
 
@@ -49,11 +47,3 @@ class test_party():
                         .filter("status <> 'REJECTED'")
 
         bancos_df.show()
-
-        # @staticmethod
-        # def cuentapuente_data(value):
-        #         str_message = str(value)
-        #         if str_message.startswith('CUENTA PUENTE ACH'):
-        #                 return 1
-        #         else:
-        #                 return 0
