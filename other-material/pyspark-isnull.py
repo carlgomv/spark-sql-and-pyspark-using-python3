@@ -12,6 +12,7 @@ data = [
     ("Anna","NY","F"," 10   "),
     ("Julia",None,None,"  9223372036854775807"),
     ("Juan","CN","M","  "),
+    ("Jhon","GE","M"," 11 10   ")
   ]
 
 columns = ["name","state","gender","zip"]
