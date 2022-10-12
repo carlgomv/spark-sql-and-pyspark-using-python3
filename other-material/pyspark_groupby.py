@@ -46,3 +46,9 @@ df.groupBy("department") \
       F.max("bonus").alias("max_bonus")) \
     .filter("sum_bonus >= 50000") \
     .show(truncate=False)
+
+newDf = df
+newDf = newDf.groupBy("department","state") \
+             .agg(F.sum("salary").alias("sum_salario"),F.max("bonus").alias("max_bonus"))
+newDf.show()
+newDf.printSchema()
