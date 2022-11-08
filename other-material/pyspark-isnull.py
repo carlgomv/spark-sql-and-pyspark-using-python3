@@ -8,11 +8,13 @@ spark = SparkSession.builder.master("local[1]") \
 
 # Create DataFrame
 data = [
-    ("James",None,"M","  1120  "),
+    ("James",None,"M","  11  "),
     ("Anna","NY","F"," 10   "),
     ("Julia",None,None,"  9223372036854775807"),
-    ("Juan","CN","M","  "),
-    ("Jhon","GE","M"," 11 10   ")
+    ("Juan","CN","M",""),
+    ("Gil",None,None,None),
+    ("Dani","CN","M",""),
+    ("George","GE","M","    ")
   ]
 
 columns = ["name","state","gender","zip"]
@@ -23,13 +25,26 @@ df.show()
 print(f'Trim')
 df = df.withColumn('zip',F.trim(df.zip))
 df.show()
+
+print(f'Filter Using isNull()')
+df.filter(df.zip.isNull()).show()
+
 print(f'Filter Using isNotNull()')
 df.filter(df.zip.isNotNull()).show()
-print(f'cast long')
-df = df.withColumn('zip',df.zip.cast('long'))
-df.show()
-print(f'na.fill')
-df = df.na.fill(-1,subset=['zip']).show()
+
+print(f'Filter cast(int) isNull()')
+df.filter(df.zip.cast('int').isNull()).show()
+
+print(f'Filter cast(int) isNotNull()')
+df.filter(df.zip.cast('int').isNotNull()).show()
+
+# print(f'Filter Using isNotNull()')
+# df.filter(df.zip.isNotNull()).show()
+# print(f'cast long')
+# df = df.withColumn('zip',df.zip.cast('long'))
+# df.show()
+# print(f'na.fill')
+# df = df.na.fill(-1,subset=['zip']).show()
 #df.filter(df.zip.cast('int').isNotNull()).show()
 
 # # Using isNull()
