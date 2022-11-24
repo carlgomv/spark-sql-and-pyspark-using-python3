@@ -1,42 +1,47 @@
 # Source: https://sparkbyexamples.com/pyspark/pyspark-isnull/
 #Import
 import pyspark.sql.functions as F
-from pyspark.sql.functions import trim
+from pyspark.sql.functions import trim, when
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.master("local[1]") \
     .appName("SparkByExamples.com").getOrCreate()
 
 # Create DataFrame
 data = [
-    ("James",None,"M","  11  "),
-    ("Anna","NY","F"," 10   "),
-    ("Julia",None,None,"  9223372036854775807"),
-    ("Juan","CN","M",""),
-    ("Gil",None,None,None),
-    ("Dani","CN","M",""),
-    ("George","GE","M","    ")
+    ("James",None,"Cesar","M","  11  "),
+    ("Anna","NY","Choco","F"," 10   "),
+    ("Julia",None,None,None,"  9223372036854775807"),
+    ("Juan","CN","Cundi","M",""),
+    ("Gil",None,"Meta",None,None),
+    ("Dani","CN","Magda","M",""),
+    ("George","GE","Valle","M","    ")
   ]
 
-columns = ["name","state","gender","zip"]
+columns = ["name","state","estado","gender","zip"]
 df = spark.createDataFrame(data,columns)
 print(f'Original Dataframe')
 df.show()
 
-print(f'Trim')
-df = df.withColumn('zip',F.trim(df.zip))
+df = df.withColumn('depto', when(df.state.isNotNull(),df.state)
+              .otherwise(df.estado)) \
+              .na.fill('SIN DATOS','depto')
 df.show()
 
-print(f'Filter Using isNull()')
-df.filter(df.zip.isNull()).show()
+# print(f'Trim')
+# df = df.withColumn('zip',F.trim(df.zip))
+# df.show()
 
-print(f'Filter Using isNotNull()')
-df.filter(df.zip.isNotNull()).show()
+# print(f'Filter Using isNull()')
+# df.filter(df.zip.isNull()).show()
 
-print(f'Filter cast(int) isNull()')
-df.filter(df.zip.cast('int').isNull()).show()
+# print(f'Filter Using isNotNull()')
+# df.filter(df.zip.isNotNull()).show()
 
-print(f'Filter cast(int) isNotNull()')
-df.filter(df.zip.cast('int').isNotNull()).show()
+# print(f'Filter cast(int) isNull()')
+# df.filter(df.zip.cast('int').isNull()).show()
+
+# print(f'Filter cast(int) isNotNull()')
+# df.filter(df.zip.cast('int').isNotNull()).show()
 
 # print(f'Filter Using isNotNull()')
 # df.filter(df.zip.isNotNull()).show()
